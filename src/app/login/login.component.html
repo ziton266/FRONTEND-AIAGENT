@@ -1,0 +1,62 @@
+<div class="login-container">
+  <div class="login-form">
+    <div class="logo">
+      <h1>Jira Portal</h1>
+      <p>Veuillez vous connecter pour continuer.</p>
+    </div>
+
+    <!-- Alert pour les messages du backend -->
+    <div 
+      *ngIf="showAlert" 
+      class="alert" 
+      [ngClass]="{'alert-success': alertType === 'success', 'alert-error': alertType === 'error'}">
+      <span class="alert-message">{{ alertMessage }}</span>
+      <button type="button" class="alert-close" (click)="hideAlert()">&times;</button>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Champ Username -->
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <input 
+          type="text" 
+          id="username" 
+          formControlName="username"
+          [class.error]="hasError('username')"
+          placeholder="Entrez votre nom d'utilisateur">
+        
+        <div 
+          *ngIf="hasError('username')" 
+          class="error-message">
+          Le nom d'utilisateur est requis
+        </div>
+      </div>
+
+      <!-- Champ Password -->
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password"
+          [class.error]="hasError('password')"
+          placeholder="Entrez votre mot de passe">
+        
+        <div 
+          *ngIf="hasError('password')" 
+          class="error-message">
+          Le mot de passe est requis
+        </div>
+      </div>
+
+      <!-- Bouton de connexion -->
+      <button 
+        type="submit" 
+        class="login-btn" 
+        [disabled]="isLoading">
+        <span *ngIf="isLoading" class="loading-spinner"></span>
+        <span>{{ isLoading ? 'Connexion...' : 'Se connecter' }}</span>
+      </button>
+    </form>
+  </div>
+</div>

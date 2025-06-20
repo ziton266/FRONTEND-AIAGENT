@@ -1,0 +1,153 @@
+<!-- Header with logout button -->
+<div class="app-header">
+  <div class="header-content">
+    <h1 class="app-title">Chat Assistant</h1>
+    <button class="logout-btn" (click)="logout()">
+      <i class="logout-icon">🚪</i>
+      <span>Logout</span>
+    </button>
+  </div>
+</div>
+
+<!-- Main Chat Interface -->
+<div class="chat-container">
+  <div class="chat-interface">
+    <div class="chat-header">
+      <div class="header-info">
+        <div class="assistant-avatar-header">
+          <div class="avatar-circle">
+            <i class="bot-icon">🤖</i>
+          </div>
+        </div>
+        <div class="header-text">
+          <h3 class="chat-title">AI Assistant</h3>
+          <p class="chat-subtitle">How can I help you today?</p>
+        </div>
+      </div>
+      <div class="status-indicator online"></div>
+    </div>
+
+    <div class="chat-body">
+      <div class="messages-container" #messagesContainer>
+        <!-- Welcome message -->
+        <div class="message received welcome-message" *ngIf="messages.length === 0">
+          <div class="message-avatar">
+            <div class="avatar-circle">
+              <i class="bot-icon">🤖</i>
+            </div>
+          </div>
+          <div class="message-bubble">
+            <div class="message-content">
+              Welcome! I'm your AI assistant. Ask me anything about your documents, JIRA tickets, or general questions.
+            </div>
+            <div class="message-time">{{ getCurrentTime() }}</div>
+          </div>
+        </div>
+
+        <!-- Chat messages -->
+        <div *ngFor="let message of messages; let i = index" 
+             class="message" 
+             [class.sent]="message.sent" 
+             [class.received]="!message.sent">
+          
+          <!-- User message -->
+          <div *ngIf="message.sent" class="message-bubble user-message">
+            <div *ngIf="message.isFile" class="file-attachment">
+              <div class="file-info">
+                <i class="file-icon">📄</i>
+                <span class="file-name">{{ message.fileName }}</span>
+              </div>
+            </div>
+            <div class="message-content" *ngIf="message.text">{{ message.text }}</div>
+            <div class="message-time">{{ message.timestamp || getCurrentTime() }}</div>
+          </div>
+          
+          <!-- Assistant message -->
+          <div *ngIf="!message.sent" class="assistant-message">
+            <div class="message-avatar">
+              <div class="avatar-circle">
+                <i class="bot-icon">🤖</i>
+              </div>
+            </div>
+            <div class="message-bubble">
+              <div class="message-content">{{ message.text }}</div>
+              <div class="message-time">{{ message.timestamp || getCurrentTime() }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div *ngIf="isLoading" class="message received">
+          <div class="message-avatar">
+            <div class="avatar-circle">
+              <i class="bot-icon">🤖</i>
+            </div>
+          </div>
+          <div class="message-bubble typing-indicator">
+            <div class="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-footer">
+      <!-- File selection indicator -->
+      <div *ngIf="selectedFile" class="selected-file-container">
+        <div class="selected-file">
+          <div class="file-preview">
+            <i class="file-icon">📄</i>
+            <div class="file-details">
+              <span class="file-name">{{ selectedFile?.name }}</span>
+              <span class="file-size">{{ getFileSize(selectedFile) }}</span>
+            </div>
+          </div>
+          <button (click)="removeSelectedFile()" class="remove-file-btn">
+            <i class="close-icon">×</i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Input area -->
+      <div class="input-container">
+        <div class="input-group">
+          <button class="file-upload-btn" 
+                  (click)="fileInput.click()" 
+                  title="Upload PDF file">
+            <i class="upload-icon">📎</i>
+          </button>
+          
+          <input type="file" 
+                 #fileInput 
+                 style="display: none;" 
+                 (change)="onFileSelected($event)" 
+                 accept=".pdf">
+          
+          <div class="text-input-container">
+            <input type="text"
+                   [(ngModel)]="newMessage" 
+                   placeholder="Type your message here..." 
+                   (keyup.enter)="sendMessage()"
+                   [disabled]="isLoading"
+                   class="message-input">
+          </div>
+          
+          <button class="send-btn" 
+                  (click)="sendMessage()" 
+                  [disabled]="isLoading || (!newMessage?.trim() && !selectedFile)"
+                  title="Send message">
+            <span *ngIf="isLoading" class="loading-spinner">
+              <i class="spinner">⏳</i>
+            </span>
+            <span *ngIf="!isLoading">
+              <i class="send-icon">➤</i>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
